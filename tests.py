@@ -1,0 +1,139 @@
+import pandas as pd
+
+from sklearn.datasets import fetch_covtype
+from sklearn.model_selection import train_test_split
+from sklearn.feature_selection import VarianceThreshold, RFE, SelectPercentile, SelectKBest, \
+    SelectFromModel, f_classif
+from sklearn.linear_model import LassoCV
+from sklearn.naive_bayes import GaussianNB
+from sklearn.ensemble.forest import RandomForestClassifier
+from sklearn.svm import SVC
+
+# TODO: Add databases (total 30 needed)
+# TODO: Calculate new metrics
+# TODO: Cross Validation after everything else is set up
+# TODO: Save metrics to csv instead of printing them
+
+
+def get_data(filename, labels_last=True, header=None, sep=','):
+    ds = pd.read_csv(f'./datasets/{filename}', header=header, sep=sep)
+
+    char_cols = ds.dtypes.pipe(lambda x: x[x == 'object']).index
+    for col in char_cols:
+        ds[col] = pd.factorize(ds[col])[0]
+
+    features = ds.iloc[:, 0:-1] if labels_last else ds.iloc[:, 1:len(ds)]
+    labels = ds.iloc[:, -1] if labels_last else ds.iloc[:, 0]
+
+    return features, labels
+
+
+# DATASETS
+
+iris_ds = get_data('iris.data')
+wine_ds = get_data('wine.data', False)
+wine_quality_red_ds = get_data('winequality-red.csv', header=0, sep=';')
+bank_ds = get_data('bank.csv', header=0, sep=';')
+car_ds = get_data('car.data')
+heart_disease_ds = get_data('processed.cleveland.data')
+poker_hand_ds = get_data('poker-hand-testing.data')
+abalone_ds = get_data('abalone.data')
+
+
+# FEATURE SELECTORS
+
+# select from model
+estimator = LassoCV(cv=5)
+sfm_selector = SelectFromModel(estimator)
+select_from_model = ('SelectFromModel', sfm_selector)
+
+# select k best
+skb_selector = SelectKBest(f_classif, k=2)
+select_k_best = ('SelectKBest', skb_selector)
+
+# recursive feature elimination
+estimator = LassoCV(cv=5)
+rfe_selector = RFE(estimator)
+recursive_feature_elimination = ('RecursiveFeatureElimination', rfe_selector)
+
+# variance threshold
+vt_selector = VarianceThreshold()
+variance_threshold = ('VarianceThreshold', vt_selector)
+
+# select percentile
+sp_selector = SelectPercentile(f_classif, percentile=10)
+select_percentile = ('SelectPercentile', sp_selector)
+
+selectors = [
+    select_from_model,
+    select_k_best,
+    recursive_feature_elimination,
+    variance_threshold,
+    select_percentile
+]
+
+
+# CLASSIFIERS
+
+nb_datasets = [
+    ('wine_quality_red', wine_quality_red_ds),
+    ('bank', bank_ds)
+]
+nb_clf = ('NaiveBayes', GaussianNB(), nb_datasets)
+
+svm_datasets = [
+    ('iris', iris_ds),
+    ('car', car_ds),
+    ('heart disease', heart_disease_ds),
+    ('abalone', abalone_ds)
+]
+svm_clf = ('SVM', SVC(kernel='linear', gamma='auto'), svm_datasets)
+
+rf_datasets = [
+    ('wine', wine_ds),
+    ('poker hand', poker_hand_ds)
+]
+rf_clf = ('RandomForest', RandomForestClassifier(n_estimators=10), rf_datasets)
+
+classifiers = [
+    nb_clf,
+    svm_clf,
+    rf_clf
+]
+
+
+# MAGIC
+
+def run():
+    for clf_name, clf, datasets in classifiers:
+        print('\n############################################')
+        print(clf_name)
+
+        for ds_name, ds in datasets:
+            print('============================================')
+            print(ds_name)
+            f_train, f_test, l_train, l_test = train_test_split(ds[0], ds[1],
+                                                                test_size=0.33)
+
+            print('--------------------------------------------')
+            for sel_name, sel in selectors:
+                sel_f_train, sel_f_test = selector_fit_and_transform(sel, f_train, f_test,
+                                                                     l_train)
+                clf.fit(sel_f_train, l_train)
+
+                print(sel_name)
+                print('accuracy', clf.score(sel_f_test, l_test))
+                print('--------------------------------------------')
+
+        print('############################################')
+
+
+def selector_fit_and_transform(selector, f_train, f_test, l_train):
+    selector.fit(f_train, l_train)
+    sel_features_train = selector.transform(f_train)
+    sel_features_test = selector.transform(f_test)
+    return sel_features_train, sel_features_test
+
+
+if __name__ == "__main__":
+    run()
