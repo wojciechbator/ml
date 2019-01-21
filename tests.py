@@ -32,6 +32,14 @@ def get_data(filename, labels_last=True, header=None, sep=','):
 # DATASETS
 
 iris_ds = get_data('iris.data')
+nursery_ds = get_data('nursery.data')
+ionosphere_ds = get_data('ionosphere.data')
+hepatitis_ds = get_data('hepatitis.data')
+hungarian_heart_disease_ds = get_data('hungarian_heart_disease.data')
+kr_vs_kp_ds = get_data('kr-vs-kp.data')
+balance_scale_ds = get_data('balance-scale.data')
+breast_cancer_ds = get_data('breast-cancer.data')
+adult_ds = get_data('adult.data')
 wine_ds = get_data('wine.data', False)
 wine_quality_red_ds = get_data('winequality-red.csv', header=0, sep=';')
 bank_ds = get_data('bank.csv', header=0, sep=';')
@@ -78,6 +86,10 @@ selectors = [
 
 nb_datasets = [
     ('wine_quality_red', wine_quality_red_ds),
+    ('nursery', nursery_ds),
+    ('balance scale', balance_scale_ds),
+    ('ionosphere', ionosphere_ds),
+    ('king rook vs king pawn', kr_vs_kp_ds),
     ('bank', bank_ds)
 ]
 nb_clf = ('NaiveBayes', GaussianNB(), nb_datasets)
@@ -85,6 +97,7 @@ nb_clf = ('NaiveBayes', GaussianNB(), nb_datasets)
 svm_datasets = [
     ('iris', iris_ds),
     ('car', car_ds),
+    ('hepatitis', hepatitis_ds),
     ('heart disease', heart_disease_ds),
     ('abalone', abalone_ds)
 ]
@@ -92,7 +105,10 @@ svm_clf = ('SVM', SVC(kernel='linear', gamma='auto'), svm_datasets)
 
 rf_datasets = [
     ('wine', wine_ds),
-    ('poker hand', poker_hand_ds)
+    ('adult', adult_ds),
+    ('poker hand', poker_hand_ds),
+    ('hungarian heart disease', hungarian_heart_disease_ds),
+    ('breast cancer', breast_cancer_ds)
 ]
 rf_clf = ('RandomForest', RandomForestClassifier(n_estimators=10), rf_datasets)
 
