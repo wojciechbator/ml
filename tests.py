@@ -1,4 +1,5 @@
 import pandas as pd
+import time
 
 from sklearn.datasets import fetch_covtype
 from sklearn.model_selection import train_test_split
@@ -106,9 +107,10 @@ classifiers = [
 
 def run():
     for clf_name, clf, datasets in classifiers:
+        csv_measure = []
+        csv_df = pd.DataFrame(data=csv_measure)
         print('\n############################################')
         print(clf_name)
-
         for ds_name, ds in datasets:
             print('============================================')
             print(ds_name)
@@ -117,15 +119,23 @@ def run():
 
             print('--------------------------------------------')
             for sel_name, sel in selectors:
+                sel_start = time.time()
                 sel_f_train, sel_f_test = selector_fit_and_transform(sel, f_train, f_test,
                                                                      l_train)
                 clf.fit(sel_f_train, l_train)
 
-                print(sel_name)
                 print('accuracy', clf.score(sel_f_test, l_test))
+                sel_end = time.time()
+                csv_measure.append(
+                    {'dataset_name': ds_name, 'selector_name': sel_name, 'accuracy': round(clf.score(sel_f_test, l_test), 3), 'time_elapsed_ms': int(round((sel_end - sel_start)*1000))})
                 print('--------------------------------------------')
 
         print('############################################')
+
+        output_csv_file_name = f'{clf_name}_selectors_measurements.csv'
+        csv_df = pd.DataFrame(data=csv_measure)
+        csv_df.to_csv(output_csv_file_name, index=False,
+                      sep=',', header=True, columns=['dataset_name', 'selector_name', 'accuracy', 'time_elapsed_ms'], encoding='utf-8')
 
 
 def selector_fit_and_transform(selector, f_train, f_test, l_train):
