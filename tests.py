@@ -35,6 +35,9 @@ iris_ds = get_data('iris.data')
 nursery_ds = get_data('nursery.data')
 ionosphere_ds = get_data('ionosphere.data')
 hepatitis_ds = get_data('hepatitis.data')
+tic_tac_toe_ds = get_data('tic-tac-toe.data')
+agaricus_lepiota_ds = get_data('agaricus-lepiota.data')
+zoo_ds = get_data('zoo.data')
 hungarian_heart_disease_ds = get_data('hungarian_heart_disease.data')
 kr_vs_kp_ds = get_data('kr-vs-kp.data')
 balance_scale_ds = get_data('balance-scale.data')
@@ -42,6 +45,7 @@ breast_cancer_ds = get_data('breast-cancer.data')
 adult_ds = get_data('adult.data')
 wine_ds = get_data('wine.data', False)
 wine_quality_red_ds = get_data('winequality-red.csv', header=0, sep=';')
+soybean_ds = get_data('soybean.data')
 bank_ds = get_data('bank.csv', header=0, sep=';')
 car_ds = get_data('car.data')
 heart_disease_ds = get_data('processed.cleveland.data')
@@ -89,6 +93,7 @@ nb_datasets = [
     ('nursery', nursery_ds),
     ('balance scale', balance_scale_ds),
     ('ionosphere', ionosphere_ds),
+    ('tic-tac-toe', tic_tac_toe_ds),
     ('king rook vs king pawn', kr_vs_kp_ds),
     ('bank', bank_ds)
 ]
@@ -98,6 +103,8 @@ svm_datasets = [
     ('iris', iris_ds),
     ('car', car_ds),
     ('hepatitis', hepatitis_ds),
+    ('zoo', zoo_ds),
+    ('agaricus lepiota', agaricus_lepiota_ds),
     ('heart disease', heart_disease_ds),
     ('abalone', abalone_ds)
 ]
@@ -106,6 +113,7 @@ svm_clf = ('SVM', SVC(kernel='linear', gamma='auto'), svm_datasets)
 rf_datasets = [
     ('wine', wine_ds),
     ('adult', adult_ds),
+    ('soybean', soybean_ds),
     ('poker hand', poker_hand_ds),
     ('hungarian heart disease', hungarian_heart_disease_ds),
     ('breast cancer', breast_cancer_ds)
