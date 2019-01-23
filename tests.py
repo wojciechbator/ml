@@ -33,8 +33,8 @@ def get_data(filename, labels_last=True, header=None, sep=','):
 
 iris_ds = get_data('iris.data')
 nursery_ds = get_data('nursery.data')
+parkinsons_ds = get_data('parkinsons.data')
 spambase_ds = get_data('spambase.data')
-shuttle_landing_control_ds = get_data('shuttle-landing-control.data')
 primary_tumor_ds =get_data('primary-tumor.data')
 lymphography_ds = get_data('lymphography.data')
 lung_cancer_ds = get_data('lung-cancer.data')
@@ -108,7 +108,7 @@ nb_datasets = [
     ('bank', bank_ds),
     ('dermatology', dermatology_ds),
     ('hayes roth', hayes_roth_ds),
-    ('primary tumor', primary_tumor_ds)
+    ('parkinsons', parkinsons_ds)
 ]
 nb_clf = ('NaiveBayes', GaussianNB(), nb_datasets)
 
@@ -118,11 +118,11 @@ svm_datasets = [
     ('car', car_ds),
     ('hepatitis', hepatitis_ds),
     ('zoo', zoo_ds),
+    ('primary tumor', primary_tumor_ds),
     ('agaricus lepiota', agaricus_lepiota_ds),
     ('heart disease', heart_disease_ds),
     ('abalone', abalone_ds),
-    ('lung cancer', lung_cancer_ds),
-    ('shuttle landing control', shuttle_landing_control_ds)
+    ('lung cancer', lung_cancer_ds)
 ]
 svm_clf = ('SVM', SVC(kernel='linear', gamma='auto'), svm_datasets)
 
