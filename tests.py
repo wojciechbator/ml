@@ -132,7 +132,6 @@ rf_datasets = [
     ('anneal', anneal_ds),
     ('soybean', soybean_ds),
     ('poker hand', poker_hand_ds),
-    ('hungarian heart disease', hungarian_heart_disease_ds),
     ('breast cancer', breast_cancer_ds),
     ('haberman', haberman_ds),
     ('lymphography', lymphography_ds),
