@@ -2,7 +2,7 @@ import pandas as pd
 import time
 
 from sklearn.datasets import fetch_covtype
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import KFold
 from sklearn.feature_selection import VarianceThreshold, RFE, SelectPercentile, SelectKBest, \
     SelectFromModel, f_classif
 from sklearn.linear_model import LassoCV
@@ -10,10 +10,8 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.ensemble.forest import RandomForestClassifier
 from sklearn.svm import SVC
 
-# TODO: Add databases (total 30 needed)
 # TODO: Calculate new metrics
 # TODO: Cross Validation after everything else is set up
-# TODO: Save metrics to csv instead of printing them
 
 
 def get_data(filename, labels_last=True, header=None, sep=','):
@@ -35,7 +33,7 @@ iris_ds = get_data('iris.data')
 nursery_ds = get_data('nursery.data')
 parkinsons_ds = get_data('parkinsons.data')
 spambase_ds = get_data('spambase.data')
-primary_tumor_ds =get_data('primary-tumor.data')
+primary_tumor_ds = get_data('primary-tumor.data')
 lymphography_ds = get_data('lymphography.data')
 lung_cancer_ds = get_data('lung-cancer.data')
 hayes_roth_ds = get_data('hayes-roth.data')
@@ -102,13 +100,13 @@ nb_datasets = [
     ('wine_quality_red', wine_quality_red_ds),
     ('nursery', nursery_ds),
     ('balance scale', balance_scale_ds),
-    ('ionosphere', ionosphere_ds),
-    ('tic-tac-toe', tic_tac_toe_ds),
-    ('king rook vs king pawn', kr_vs_kp_ds),
+    #('ionosphere', ionosphere_ds),
+    #('tic-tac-toe', tic_tac_toe_ds),
+    #('king rook vs king pawn', kr_vs_kp_ds),
     ('bank', bank_ds),
     ('dermatology', dermatology_ds),
-    ('hayes roth', hayes_roth_ds),
-    ('parkinsons', parkinsons_ds)
+    ('hayes roth', hayes_roth_ds)
+    #('parkinsons', parkinsons_ds)
 ]
 nb_clf = ('NaiveBayes', GaussianNB(), nb_datasets)
 
@@ -117,21 +115,21 @@ svm_datasets = [
     ('iris', iris_ds),
     ('car', car_ds),
     ('hepatitis', hepatitis_ds),
-    ('zoo', zoo_ds),
+    #('zoo', zoo_ds),
     ('primary tumor', primary_tumor_ds),
-    ('agaricus lepiota', agaricus_lepiota_ds),
+    #('agaricus lepiota', agaricus_lepiota_ds),
     ('heart disease', heart_disease_ds),
-    ('abalone', abalone_ds),
-    ('lung cancer', lung_cancer_ds)
+    ('abalone', abalone_ds)
+    #('lung cancer', lung_cancer_ds)
 ]
 svm_clf = ('SVM', SVC(kernel='linear', gamma='auto'), svm_datasets)
 
 rf_datasets = [
     ('wine', wine_ds),
     ('adult', adult_ds),
-    ('anneal', anneal_ds),
-    ('soybean', soybean_ds),
-    ('poker hand', poker_hand_ds),
+    #('anneal', anneal_ds),
+    #('soybean', soybean_ds),
+    #('poker hand', poker_hand_ds), # works, but takes forever to process in CV
     ('breast cancer', breast_cancer_ds),
     ('haberman', haberman_ds),
     ('lymphography', lymphography_ds),
@@ -149,6 +147,8 @@ classifiers = [
 # MAGIC
 
 def run():
+    k = 10
+    kf = KFold(n_splits=k, shuffle=True, random_state=42)
     for clf_name, clf, datasets in classifiers:
         csv_measure = []
         csv_df = pd.DataFrame(data=csv_measure)
@@ -157,28 +157,53 @@ def run():
         for ds_name, ds in datasets:
             print('============================================')
             print(ds_name)
-            f_train, f_test, l_train, l_test = train_test_split(ds[0], ds[1],
-                                                                test_size=0.33)
 
+            metrics = {}
+            for train_index, test_index in kf.split(ds[0]):
+
+                f_train = ds[0].iloc[train_index]
+                l_train = ds[1].iloc[train_index]
+                f_test = ds[0].iloc[test_index]
+                l_test = ds[1].iloc[test_index]
+
+                for sel_name, sel in selectors:
+                    if sel_name not in metrics:
+                        metrics[sel_name] = {}
+                        metrics[sel_name]['accuracy'] = 0
+                        metrics[sel_name]['time_elapsed_ms'] = 0
+                    
+                    sel_start = time.time()
+                    sel_f_train, sel_f_test = selector_fit_and_transform(sel, f_train, f_test,
+                                                                         l_train)
+                    clf.fit(sel_f_train, l_train)
+
+                    sel_end = time.time()
+
+                    metrics[sel_name]['accuracy'] += clf.score(sel_f_test, l_test)
+                    metrics[sel_name]['time_elapsed_ms'] += int(round((sel_end - sel_start)*1000))
+            
             print('--------------------------------------------')
-            for sel_name, sel in selectors:
-                sel_start = time.time()
-                sel_f_train, sel_f_test = selector_fit_and_transform(sel, f_train, f_test,
-                                                                     l_train)
-                clf.fit(sel_f_train, l_train)
+            for key, value in metrics.items():
+                print(key)
 
-                print('accuracy', clf.score(sel_f_test, l_test))
-                sel_end = time.time()
-                csv_measure.append(
-                    {'dataset_name': ds_name, 'selector_name': sel_name, 'accuracy': round(clf.score(sel_f_test, l_test), 3), 'time_elapsed_ms': int(round((sel_end - sel_start)*1000))})
+                accuracy = value['accuracy'] / k
+                time_elapsed_ms = value['time_elapsed_ms'] / k 
+                
+                print('accuracy', accuracy)
+                csv_measure.append({
+                    'dataset_name': ds_name,
+                    'selector_name': key,
+                    'accuracy': round(accuracy, 3),
+                    'time_elapsed_ms': time_elapsed_ms
+                })
                 print('--------------------------------------------')
 
         print('############################################')
 
         output_csv_file_name = f'{clf_name}_selectors_measurements.csv'
         csv_df = pd.DataFrame(data=csv_measure)
-        csv_df.to_csv(output_csv_file_name, index=False,
-                      sep=',', header=True, columns=['dataset_name', 'selector_name', 'accuracy', 'time_elapsed_ms'], encoding='utf-8')
+        csv_df.to_csv(output_csv_file_name, index=False, sep=',', header=True,
+                      columns=['dataset_name', 'selector_name', 'accuracy', 'time_elapsed_ms'], encoding='utf-8')
 
 
 def selector_fit_and_transform(selector, f_train, f_test, l_train):
