@@ -101,7 +101,6 @@ selectors = [
 # CLASSIFIERS
 
 nb_datasets = [
-    ('wholesale', wholesale_ds),
     ('wine_quality_red', wine_quality_red_ds),
     ('nursery', nursery_ds),
     ('balance scale', balance_scale_ds),
@@ -111,12 +110,12 @@ nb_datasets = [
     ('hayes roth', hayes_roth_ds),
     ('bridges', bridges_ds),
     ('flag', flag_ds),
-    ('sonar', sonar_ds)
 ]
 nb_clf = ('NaiveBayes', GaussianNB(), nb_datasets)
 
 svm_datasets = [
     ('glass', glass_ds),
+    ('wholesale', wholesale_ds),
     ('iris', iris_ds),
     ('car', car_ds),
     ('hepatitis', hepatitis_ds),
@@ -233,7 +232,7 @@ def run():
         output_csv_file_name = f'{clf_name}_selectors_measurements.csv'
         csv_df = pd.DataFrame(data=csv_measure)
         csv_df.to_csv(output_csv_file_name, index=False, sep=',', header=True,
-                      columns=['dataset_name', 'selector_name', 'accuracy', 'time_elapsed_ms'], encoding='utf-8')
+                      columns=['dataset_name', 'selector_name', 'accuracy', 'time_elapsed_ms', 'no_of_features', 'no_of_features_selected', 'precision', 'recall', 'f1'], encoding='utf-8')
 
 
 def selector_fit_and_transform(selector, f_train, f_test, l_train):
