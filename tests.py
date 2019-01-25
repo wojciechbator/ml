@@ -57,6 +57,7 @@ breast_cancer_ds = get_data('breast-cancer.data')
 adult_ds = get_data('adult.data')
 wine_ds = get_data('wine.data', False)
 banknote_ds = get_data('banknote.data')
+wholesale_ds = get_data('wholesale.csv')
 wine_quality_red_ds = get_data('winequality-red.csv', header=0, sep=';')
 bank_ds = get_data('bank.csv', header=0, sep=';')
 car_ds = get_data('car.data')
@@ -100,6 +101,7 @@ selectors = [
 # CLASSIFIERS
 
 nb_datasets = [
+    ('wholesale', wholesale_ds),
     ('wine_quality_red', wine_quality_red_ds),
     ('nursery', nursery_ds),
     ('balance scale', balance_scale_ds),
@@ -123,7 +125,6 @@ svm_datasets = [
     ('abalone', abalone_ds),
     ('cmc', cmc_ds),
     ('tae', tae_ds),
-    ('eighthr', eighthr_ds)
 ]
 svm_clf = ('SVM', SVC(kernel='linear', gamma='auto'), svm_datasets)
 
