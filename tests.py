@@ -54,6 +54,7 @@ balance_scale_ds = get_data('balance-scale.data')
 breast_cancer_ds = get_data('breast-cancer.data')
 adult_ds = get_data('adult.data')
 wine_ds = get_data('wine.data', False)
+banknote_ds = get_data('banknote.data')
 wine_quality_red_ds = get_data('winequality-red.csv', header=0, sep=';')
 bank_ds = get_data('bank.csv', header=0, sep=';')
 car_ds = get_data('car.data')
@@ -125,6 +126,7 @@ svm_datasets = [
 svm_clf = ('SVM', SVC(kernel='linear', gamma='auto'), svm_datasets)
 
 rf_datasets = [
+    ('banknote', banknote_ds),
     ('wine', wine_ds),
     ('adult', adult_ds),
     ('breast cancer', breast_cancer_ds),
