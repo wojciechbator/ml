@@ -1,5 +1,6 @@
 import pandas as pd
 import time
+import numpy as np
 
 from sklearn.datasets import fetch_covtype
 from sklearn.model_selection import KFold
@@ -9,9 +10,7 @@ from sklearn.linear_model import LassoCV
 from sklearn.naive_bayes import GaussianNB
 from sklearn.ensemble.forest import RandomForestClassifier
 from sklearn.svm import SVC
-
-# TODO: Calculate new metrics
-# TODO: Cross Validation after everything else is set up
+from sklearn.metrics import recall_score, precision_score, f1_score
 
 
 def get_data(filename, labels_last=True, header=None, sep=','):
@@ -78,7 +77,7 @@ rfe_selector = RFE(estimator)
 recursive_feature_elimination = ('RecursiveFeatureElimination', rfe_selector)
 
 # variance threshold
-vt_selector = VarianceThreshold()
+vt_selector = VarianceThreshold(threshold=.5)
 variance_threshold = ('VarianceThreshold', vt_selector)
 
 # select percentile
@@ -169,18 +168,29 @@ def run():
                 for sel_name, sel in selectors:
                     if sel_name not in metrics:
                         metrics[sel_name] = {}
+                        metrics[sel_name]['no_of_features'] = f_test.shape[1]
+                        metrics[sel_name]['no_of_features_selected'] = 0
                         metrics[sel_name]['accuracy'] = 0
                         metrics[sel_name]['time_elapsed_ms'] = 0
+                        metrics[sel_name]['precision'] = 0
+                        metrics[sel_name]['recall'] = 0
+                        metrics[sel_name]['f1'] = 0
                     
                     sel_start = time.time()
                     sel_f_train, sel_f_test = selector_fit_and_transform(sel, f_train, f_test,
                                                                          l_train)
                     clf.fit(sel_f_train, l_train)
 
+                    pred = clf.predict(sel_f_test)
+
                     sel_end = time.time()
 
+                    metrics[sel_name]['no_of_features_selected'] += len(sel_f_test[0])
                     metrics[sel_name]['accuracy'] += clf.score(sel_f_test, l_test)
                     metrics[sel_name]['time_elapsed_ms'] += int(round((sel_end - sel_start)*1000))
+                    metrics[sel_name]['precision'] += precision_score(l_test.values, pred, average='micro')
+                    metrics[sel_name]['recall'] += recall_score(l_test.values, pred, average='micro')
+                    metrics[sel_name]['f1'] += f1_score(l_test.values, pred, average='micro')
             
             print('--------------------------------------------')
             for key, value in metrics.items():
@@ -188,13 +198,27 @@ def run():
 
                 accuracy = value['accuracy'] / k
                 time_elapsed_ms = value['time_elapsed_ms'] / k 
+                no_of_features_selected = round(value['no_of_features_selected'] / k)
+                precision = value['precision'] / k
+                recall = value['recall'] / k
+                f1 = value['f1'] / k
                 
                 print('accuracy', accuracy)
+                print('no_of_features', value['no_of_features'])
+                print('no_of_features_selected', no_of_features_selected)
+                print('precision', precision)
+                print('recall', recall)
+                print('f1', f1)
                 csv_measure.append({
                     'dataset_name': ds_name,
                     'selector_name': key,
                     'accuracy': round(accuracy, 3),
-                    'time_elapsed_ms': time_elapsed_ms
+                    'time_elapsed_ms': time_elapsed_ms,
+                    'no_of_features': value['no_of_features'],
+                    'no_of_features_selected': no_of_features_selected,
+                    'precision': precision,
+                    'recall': recall,
+                    'f1': f1
                 })
                 print('--------------------------------------------')
 
