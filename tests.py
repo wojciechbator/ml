@@ -31,33 +31,33 @@ def get_data(filename, labels_last=True, header=None, sep=','):
 
 iris_ds = get_data('iris.data')
 nursery_ds = get_data('nursery.data')
-parkinsons_ds = get_data('parkinsons.data')
+transfusion_ds = get_data('transfusion.data')
+eighthr_ds = get_data('eighthr.data')
+sonar_ds = get_data('sonar.data')
+congress_ds = get_data('house-votes-84.data')
+tae_ds = get_data('tae.data')
+flag_ds = get_data('flag.data')
+bridges_ds = get_data('bridges.data')
+bands_ds = get_data('bands.data')
+cmc_ds = get_data('cmc.data')
+krkopt_ds = get_data('krkopt.data')
 spambase_ds = get_data('spambase.data')
 primary_tumor_ds = get_data('primary-tumor.data')
 lymphography_ds = get_data('lymphography.data')
-lung_cancer_ds = get_data('lung-cancer.data')
 hayes_roth_ds = get_data('hayes-roth.data')
 haberman_ds = get_data('haberman.data')
-ionosphere_ds = get_data('ionosphere.data')
 glass_ds = get_data('glass.data')
 dermatology_ds = get_data('dermatology.data')
 hepatitis_ds = get_data('hepatitis.data')
-tic_tac_toe_ds = get_data('tic-tac-toe.data')
-agaricus_lepiota_ds = get_data('agaricus-lepiota.data')
-zoo_ds = get_data('zoo.data')
 hungarian_heart_disease_ds = get_data('hungarian_heart_disease.data')
-kr_vs_kp_ds = get_data('kr-vs-kp.data')
-anneal_ds = get_data('anneal.data')
 balance_scale_ds = get_data('balance-scale.data')
 breast_cancer_ds = get_data('breast-cancer.data')
 adult_ds = get_data('adult.data')
 wine_ds = get_data('wine.data', False)
 wine_quality_red_ds = get_data('winequality-red.csv', header=0, sep=';')
-soybean_ds = get_data('soybean.data')
 bank_ds = get_data('bank.csv', header=0, sep=';')
 car_ds = get_data('car.data')
 heart_disease_ds = get_data('processed.cleveland.data')
-poker_hand_ds = get_data('poker-hand-testing.data')
 abalone_ds = get_data('abalone.data')
 
 
@@ -100,13 +100,13 @@ nb_datasets = [
     ('wine_quality_red', wine_quality_red_ds),
     ('nursery', nursery_ds),
     ('balance scale', balance_scale_ds),
-    #('ionosphere', ionosphere_ds),
-    #('tic-tac-toe', tic_tac_toe_ds),
-    #('king rook vs king pawn', kr_vs_kp_ds),
+    ('king rook vs king', krkopt_ds),
     ('bank', bank_ds),
     ('dermatology', dermatology_ds),
-    ('hayes roth', hayes_roth_ds)
-    #('parkinsons', parkinsons_ds)
+    ('hayes roth', hayes_roth_ds),
+    ('bridges', bridges_ds),
+    ('flag', flag_ds),
+    ('sonar', sonar_ds)
 ]
 nb_clf = ('NaiveBayes', GaussianNB(), nb_datasets)
 
@@ -115,25 +115,25 @@ svm_datasets = [
     ('iris', iris_ds),
     ('car', car_ds),
     ('hepatitis', hepatitis_ds),
-    #('zoo', zoo_ds),
     ('primary tumor', primary_tumor_ds),
-    #('agaricus lepiota', agaricus_lepiota_ds),
     ('heart disease', heart_disease_ds),
-    ('abalone', abalone_ds)
-    #('lung cancer', lung_cancer_ds)
+    ('abalone', abalone_ds),
+    ('cmc', cmc_ds),
+    ('tae', tae_ds),
+    ('eighthr', eighthr_ds)
 ]
 svm_clf = ('SVM', SVC(kernel='linear', gamma='auto'), svm_datasets)
 
 rf_datasets = [
     ('wine', wine_ds),
     ('adult', adult_ds),
-    #('anneal', anneal_ds),
-    #('soybean', soybean_ds),
-    #('poker hand', poker_hand_ds), # works, but takes forever to process in CV
     ('breast cancer', breast_cancer_ds),
     ('haberman', haberman_ds),
     ('lymphography', lymphography_ds),
-    ('spambase', spambase_ds)
+    ('spambase', spambase_ds),
+    ('bands', bands_ds),
+    ('congress', congress_ds),
+    ('transfusion', transfusion_ds)
 ]
 rf_clf = ('RandomForest', RandomForestClassifier(n_estimators=10), rf_datasets)
 
