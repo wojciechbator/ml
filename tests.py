@@ -1,6 +1,9 @@
 import pandas as pd
 import time
 import numpy as np
+import warnings
+
+warnings.filterwarnings('ignore')
 
 from sklearn.datasets import fetch_covtype
 from sklearn.model_selection import KFold
@@ -188,9 +191,9 @@ def run():
                     metrics[sel_name]['no_of_features_selected'] += len(sel_f_test[0])
                     metrics[sel_name]['accuracy'] += clf.score(sel_f_test, l_test)
                     metrics[sel_name]['time_elapsed_ms'] += int(round((sel_end - sel_start)*1000))
-                    metrics[sel_name]['precision'] += precision_score(l_test.values, pred, average='micro')
-                    metrics[sel_name]['recall'] += recall_score(l_test.values, pred, average='micro')
-                    metrics[sel_name]['f1'] += f1_score(l_test.values, pred, average='micro')
+                    metrics[sel_name]['precision'] += precision_score(l_test.values, pred, average='macro')
+                    metrics[sel_name]['recall'] += recall_score(l_test.values, pred, average='macro')
+                    metrics[sel_name]['f1'] += f1_score(l_test.values, pred, average='macro')
             
             print('--------------------------------------------')
             for key, value in metrics.items():
