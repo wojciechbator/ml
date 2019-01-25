@@ -33,6 +33,7 @@ def get_data(filename, labels_last=True, header=None, sep=','):
 
 iris_ds = get_data('iris.data')
 nursery_ds = get_data('nursery.data')
+drug_consumption_ds = get_data('drug_consumption.data')
 transfusion_ds = get_data('transfusion.data')
 eighthr_ds = get_data('eighthr.data')
 sonar_ds = get_data('sonar.data')
@@ -102,6 +103,7 @@ selectors = [
 
 nb_datasets = [
     ('wine_quality_red', wine_quality_red_ds),
+    ('drug consumption', drug_consumption_ds),
     ('nursery', nursery_ds),
     ('balance scale', balance_scale_ds),
     ('king rook vs king', krkopt_ds),
